@@ -8,6 +8,7 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Base64;
@@ -57,13 +58,23 @@ public class CryptoUtil {
     }
 
     public static String SHA256(String password, byte[] salt) throws Exception {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
 
-        digest.update(salt);
+            digest.update(salt);
 
-        byte[] hashBytes = digest.digest(password.getBytes("UTF-8"));
+            byte[] hashBytes = digest.digest(password.getBytes("UTF-8"));
 
-        return Base64.getEncoder().encodeToString(hashBytes);
+            StringBuilder hexHash = new StringBuilder();
+
+            for (byte b : hashBytes)
+                hexHash.append(String.format("%02x", b));
+
+            return hexHash.toString();
+        }
+        catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException();
+        }
     }
 
     public static Boolean SHA256Match(String plainPasswd, String hashedPasswd, byte[] salt) throws Exception {

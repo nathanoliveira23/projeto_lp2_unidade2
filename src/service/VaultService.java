@@ -26,10 +26,10 @@ public class VaultService {
         byte[] salt = CryptoUtil.newSalt();
         String passwdStr = new String(masterPassword);
         String verifier = CryptoUtil.SHA256(passwdStr, salt);
-//        SecretKey key = CryptoUtil.deriveKey(masterPassword, salt);
+        SecretKey key = CryptoUtil.deriveKey(masterPassword, salt);
 //        String verifier = Base64.getEncoder().encodeToString(key.getEncoded());
         currentUser = new User(username, salt, verifier);
-//        sessionKey = key;
+        sessionKey = key;
 
         saveStore();
     }
@@ -40,13 +40,21 @@ public class VaultService {
         if (currentUser == null || !currentUser.getUsername().equals(username)) 
             throw new AuthenticationException("Usuário não existe.");
 
-        SecretKey candidate = CryptoUtil.deriveKey(masterPassword, currentUser.getSalt());
-        String candidateHash = Base64.getEncoder().encodeToString(candidate.getEncoded());
+        String passwdStr = new String(masterPassword);
+        String candidateHash = CryptoUtil.SHA256(passwdStr, currentUser.getSalt());
 
-        if (!candidateHash.equals(currentUser.getVerifierHash())) 
+        System.out.println("Login: " + currentUser.getVerifierHash());
+
+        if (!candidateHash.equals(currentUser.getVerifierHash()))
             throw new AuthenticationException("Senha mestra incorreta.");
 
-        sessionKey = candidate;
+        SecretKey secretKey = CryptoUtil.deriveKey(masterPassword, currentUser.getSalt());
+//        String candidateHash = Base64.getEncoder().encodeToString(candidate.getEncoded());
+//
+//        if (!candidateHash.equals(currentUser.getVerifierHash())) 
+//            throw new AuthenticationException("Senha mestra incorreta.");
+//
+        sessionKey = secretKey;
     }
 
     public void addEntry(String title, String usernameEntry, String plainPassword, String url, String notes) throws Exception {

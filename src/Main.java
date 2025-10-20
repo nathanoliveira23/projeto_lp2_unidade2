@@ -4,10 +4,27 @@ import model.VaultEntry;
 import java.util.*;
 import java.io.Console;
 import service.VaultService;
+import util.CryptoUtil;
 
 public class Main {
     public static void main(String[] args) {
         VaultService vs = new VaultService();
+
+        //String pass = "teste";
+        //byte[] salt = CryptoUtil.newSalt();
+
+        //try {
+        //    String hashPass = CryptoUtil.SHA256(pass, salt);
+        //    System.out.println(hashPass);
+
+        //    Boolean hashCompare = CryptoUtil.SHA256Match(pass, hashPass, salt);
+
+        //    System.out.println(hashCompare.booleanValue());
+        //}
+        //catch (Exception e) {
+        //    System.out.println(e);
+        //}
+
         Scanner sc = new Scanner(System.in);
         Console console = System.console();
 
