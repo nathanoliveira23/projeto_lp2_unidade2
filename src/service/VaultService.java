@@ -12,7 +12,7 @@ import java.util.Base64;
 public class VaultService {
     private Map<String, VaultEntry> entries = new LinkedHashMap<>();
     private User currentUser = null;
-    private SecretKey sessionKey = null;
+    private SecretKey privateKey = null;
     private static final Path STORE = Paths.get("vault_store.txt");
 
     // Register: only one user supported in this simple model
@@ -29,7 +29,7 @@ public class VaultService {
         SecretKey key = CryptoUtil.deriveKey(masterPassword, salt);
 //        String verifier = Base64.getEncoder().encodeToString(key.getEncoded());
         currentUser = new User(username, salt, verifier);
-        sessionKey = key;
+        privateKey = key;
 
         saveStore();
     }
@@ -54,14 +54,14 @@ public class VaultService {
 //        if (!candidateHash.equals(currentUser.getVerifierHash())) 
 //            throw new AuthenticationException("Senha mestra incorreta.");
 //
-        sessionKey = secretKey;
+        privateKey = secretKey;
     }
 
     public void addEntry(String title, String usernameEntry, String plainPassword, String url, String notes) throws Exception {
-        if (sessionKey == null) 
+        if (privateKey == null) 
             throw new AuthenticationException("Não autenticado.");
 
-        String encrypted = CryptoUtil.encrypt(plainPassword, sessionKey);
+        String encrypted = CryptoUtil.encrypt(plainPassword, privateKey);
         VaultEntry e = new VaultEntry(title, usernameEntry, encrypted, url, notes);
         entries.put(e.getId(), e);
 
@@ -76,19 +76,21 @@ public class VaultService {
         if (e == null) 
             throw new EntryNotFoundException("Entrada não encontrada.");
 
-        if (sessionKey == null) 
+        if (privateKey == null) 
             throw new AuthenticationException("Não autenticado.");
 
-        return CryptoUtil.decrypt(e.getEncryptedPassword(), sessionKey);
+        return CryptoUtil.decrypt(e.getEncryptedPassword(), privateKey);
     }
 
     public void updateEntry(String id, String title, String usernameEntry, String plainPassword, String url, String notes) throws Exception {
         VaultEntry e = entries.get(id);
 
-        if (e == null) throw new EntryNotFoundException("Entrada não encontrada.");
+        if (e == null) 
+            throw new EntryNotFoundException("Entrada não encontrada.");
+
         if (title != null) e.setTitle(title);
         if (usernameEntry != null) e.setUsername(usernameEntry);
-        if (plainPassword != null) e.setEncryptedPassword(CryptoUtil.encrypt(plainPassword, sessionKey));
+        if (plainPassword != null) e.setEncryptedPassword(CryptoUtil.encrypt(plainPassword, privateKey));
         if (url != null) e.setUrl(url);
         if (notes != null) e.setNotes(notes);
 
