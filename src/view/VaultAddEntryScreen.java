@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 import app.ScreenManager;
 import service.VaultService;
+import util.ConsoleUtil;
 
 public class VaultAddEntryScreen extends Screen {
     public VaultAddEntryScreen(ScreenManager sm, VaultService vs, Scanner sc) {
@@ -13,31 +14,32 @@ public class VaultAddEntryScreen extends Screen {
     @Override
     public Screen show() {
         try {
-            System.out.print("Título (ex: Gmail): "); 
+            System.out.print(">>> Título (ex: Gmail): "); 
             String title = sc.nextLine();
-            System.out.print("Usuário: "); 
+            System.out.print(">>> Usuário: "); 
             String uname = sc.nextLine();
-            System.out.print("Senha (ou deixe vazio para gerar): "); 
+            System.out.print(">>> Senha (ou deixe vazio para gerar): "); 
             String pass = sc.nextLine();
 
             if (pass.isBlank()) {
-                System.out.print("Tamanho da senha: "); int len = Integer.parseInt(sc.nextLine());
+                System.out.print(">>> Tamanho da senha: "); int len = Integer.parseInt(sc.nextLine());
                 pass = vaultService.generatePassword(len);
-                System.out.println("Senha gerada: " + pass);
+                System.out.println(">>> Senha gerada: " + pass);
             }
 
-            System.out.print("URL: "); String url = sc.nextLine();
-            System.out.print("Notas: "); String notes = sc.nextLine();
+            System.out.print(">>> URL: "); String url = sc.nextLine();
+            System.out.print(">>> Notas: "); String notes = sc.nextLine();
             vaultService.addEntry(title, uname, pass, url, notes);
-            System.out.println("Entrada adicionada.");
+            System.out.println(">>> Entrada adicionada.");
 
-            System.out.println("\n\nPressione ENTER para continuar...");
-            sc.nextLine();
+            ConsoleUtil.waitForEnter(sc);
 
             return new VaultScreen(screenManager, vaultService, sc);
         }
         catch (Exception e) {
             System.out.println("Erro: " + e.getMessage());
+            ConsoleUtil.waitForEnter(sc);
+
             return this;
         }
     }

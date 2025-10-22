@@ -2,6 +2,7 @@ package app;
 
 import java.util.Scanner;
 import service.VaultService;
+import util.ConsoleUtil;
 import view.LoginScreen;
 import view.Screen;
 
@@ -14,9 +15,9 @@ public class ScreenManager {
         Screen current = new LoginScreen(this, vaultService, sc);
 
         while (running) {
+            ConsoleUtil.clearScreen();
             current = current.show();
         }
-
     }
 
     public void stop() {

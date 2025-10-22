@@ -5,6 +5,7 @@ import java.util.Scanner;
 
 import app.ScreenManager;
 import service.VaultService;
+import util.ConsoleUtil;
 
 public class RegisterScreen extends Screen {
     Console console = System.console();
@@ -16,26 +17,24 @@ public class RegisterScreen extends Screen {
     @Override
     public Screen show() {
         try {
-            System.out.print("Nome de usuário: "); 
+            System.out.print(">>> Nome de usuário: "); 
             String u = sc.nextLine();
-            char[] pw = (console != null) ? console.readPassword("Senha mestra: ") : sc.nextLine().toCharArray();
+            char[] pw = (console != null) 
+                ? console.readPassword(">>> Senha mestra: ") 
+                : sc.nextLine().toCharArray();
 
             vaultService.register(u, pw);
-            System.out.println("Usuário registrado (store atualizado).");
+            System.out.println("\n>>> Usuário registrado (store atualizado) <<<");
 
-            System.out.println("\n\nPressione ENTER para continuar...");
-            sc.nextLine();
+            ConsoleUtil.waitForEnter(sc);
 
             return new LoginScreen(screenManager, vaultService, sc);
         }
         catch (Exception e) {
             System.out.println("Erro: " + e.getMessage());
-
-            System.out.println("\n\nPressione ENTER para continuar...");
-            sc.nextLine();
+            ConsoleUtil.waitForEnter(sc);
 
             return this;
         }
-
     }
 }
