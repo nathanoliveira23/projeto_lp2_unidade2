@@ -2,53 +2,50 @@ package view;
 
 import java.util.Scanner;
 import java.io.Console;
+
 import app.ScreenManager;
+import controller.UserController;
 import service.VaultService;
 import util.ConsoleUtil;
 
 public class LoginScreen extends Screen {
-    Console console = System.console();
+    private final Console console = System.console();
+    private final UserController userController;
 
     public LoginScreen(ScreenManager sm, VaultService vs, Scanner sc) {
         super(sm, vs, sc);
+        this.userController = new UserController(vs);
     }
 
     @Override
     public Screen show() {
-        System.out.println("[1] - Registrar usuário (apenas 1)"); 
-        System.out.println("[2] - Login"); 
-        System.out.println("[0] - Sair"); 
-        System.out.print("\nOpção: ");
-
-        int option = Integer.parseInt(sc.nextLine());
-
         try {
-            switch (option) {
-                case 1: return new RegisterScreen(screenManager, vaultService, sc);
-                case 2: {
-                    System.out.print(">>> Nome de usuário: "); 
-                    String u2 = sc.nextLine();
+            printMenuHeader("Login");
 
-                    char[] pw2 = (console != null) 
-                        ? console.readPassword(">>> Senha mestra: ") 
-                        : sc.nextLine().toCharArray();
+            printInputMessage("Nome de usuário"); 
+            String username = sc.nextLine();
 
-                    vaultService.login(u2, pw2);
-                    System.out.println("\n>>> Login bem-sucedido <<<");
+            char[] password;
 
-                    ConsoleUtil.waitForEnter(sc);
-
-                    return new VaultScreen(screenManager, vaultService, sc);
-                }
-                case 0: {
-                    screenManager.stop();
-                    return this;
-                }
-                default: return this;
+            if (console != null) {
+                printInputMessage("Senha mestre");
+                password = console.readPassword();
             }
+            else {
+                password = sc.nextLine().toCharArray();
+            }
+
+            userController.login(username, password);
+
+            //System.out.println(Color.BRIGHT_GREEN.apply("\n>>> Login bem-sucedido <<<"));
+            systemMessage(MessageType.SUCCESS, "Login bem-sucedido");
+
+            ConsoleUtil.waitForEnter(sc);
+
+            return new VaultMenuScreen(screenManager, vaultService, sc);
         }
         catch (Exception e) {
-            System.out.println("Erro: " + e.getMessage());
+            systemMessage(MessageType.ERROR, e.getMessage());
             ConsoleUtil.waitForEnter(sc);
 
             return this;

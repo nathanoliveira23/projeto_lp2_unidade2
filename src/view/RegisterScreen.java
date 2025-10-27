@@ -4,34 +4,41 @@ import java.io.Console;
 import java.util.Scanner;
 
 import app.ScreenManager;
+import controller.UserController;
 import service.VaultService;
+import util.Color;
 import util.ConsoleUtil;
 
 public class RegisterScreen extends Screen {
     Console console = System.console();
+    private final UserController userController;
 
     public RegisterScreen(ScreenManager sm, VaultService vs, Scanner sc) {
         super(sm, vs, sc);
+        this.userController = new UserController(vs);
     }
 
     @Override
     public Screen show() {
         try {
-            System.out.print(">>> Nome de usuário: "); 
+            printMenuHeader("Cadastro");
+            printInputMessage("Nome de usuário"); 
             String u = sc.nextLine();
+
             char[] pw = (console != null) 
-                ? console.readPassword(">>> Senha mestra: ") 
+                ? console.readPassword(Color.BRIGHT_WHITE.apply(">>> Senha mestra: ")) 
                 : sc.nextLine().toCharArray();
 
-            vaultService.register(u, pw);
-            System.out.println("\n>>> Usuário registrado (store atualizado) <<<");
+            userController.register(u, pw);
+
+            systemMessage(MessageType.SUCCESS, "Usuário registrado com sucesso");
 
             ConsoleUtil.waitForEnter(sc);
 
-            return new LoginScreen(screenManager, vaultService, sc);
+            return new AuthenticationScreen(screenManager, vaultService, sc);
         }
         catch (Exception e) {
-            System.out.println("Erro: " + e.getMessage());
+            systemMessage(MessageType.ERROR, e.getMessage());
             ConsoleUtil.waitForEnter(sc);
 
             return this;

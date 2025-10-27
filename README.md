@@ -1,3 +1,1 @@
-# PASSMAN - Gerenciador de Senhas (Terminal)
-
-Projeto Java sem dependências externas.
+# PASSGEN - Gerenciador de Senhas (Terminal)

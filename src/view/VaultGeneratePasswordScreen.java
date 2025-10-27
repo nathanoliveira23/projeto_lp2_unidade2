@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 import app.ScreenManager;
 import service.VaultService;
+import util.ConsoleUtil;
 
 public class VaultGeneratePasswordScreen extends Screen {
     public VaultGeneratePasswordScreen(ScreenManager sm, VaultService vs, Scanner sc) {
@@ -13,20 +14,28 @@ public class VaultGeneratePasswordScreen extends Screen {
     @Override
     public Screen show() {
         try {
-            System.out.print("Tamanho: "); int len = Integer.parseInt(sc.nextLine());
-            String gen = vaultService.generatePassword(len);
-            System.out.println("Senha gerada: " + gen);
+            printMenuHeader("Gerador de senha aleatória");
 
-            System.out.println("\n\nPressione ENTER para continuar...");
-            sc.nextLine();
+            printMenuOption(1, "Gerar senha aleatória");
+            printMenuOption(2, "Fortificar senha");
+            printMenuOption(0, "Voltar para o menu\n");
 
-            return new VaultScreen(screenManager, vaultService, sc);
+            printInputMessage("Opção");
+            int option = tryParseOption(sc.nextLine());
+
+            if (option == -1) 
+                return showInvalidOption();
+
+            switch (option) {
+                case 1: return new VaultGenerateRandomPassword(screenManager, vaultService, sc);
+                case 2: return new VaultGenerateScrambledPassword(screenManager, vaultService, sc);
+                case 0: return new VaultMenuScreen(screenManager, vaultService, sc);
+                default: return showInvalidOption();
+            }
         }
         catch (Exception e) {
-            System.out.println("Erro: " + e.getMessage());
-
-            System.out.println("\n\nPressione ENTER para continuar...");
-            sc.nextLine();
+            systemMessage(MessageType.ERROR, e.getMessage());
+            ConsoleUtil.waitForEnter(sc);
 
             return this;
         }

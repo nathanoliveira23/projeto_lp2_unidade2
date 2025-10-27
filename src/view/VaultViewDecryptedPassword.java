@@ -3,30 +3,37 @@ package view;
 import java.util.Scanner;
 
 import app.ScreenManager;
+import controller.VaultController;
 import service.VaultService;
+import util.ConsoleUtil;
 
 public class VaultViewDecryptedPassword extends Screen {
+    private final VaultController vaultController;
+
     public VaultViewDecryptedPassword(ScreenManager sm, VaultService vs, Scanner sc) {
         super(sm, vs, sc);
+        this.vaultController = new VaultController(vs);
     }
     
     @Override
     public Screen show() {
         try {
-            System.out.print("ID da entrada: "); String id = sc.nextLine();
-            String pwd = vaultService.viewDecryptedPassword(id);
-            System.out.println("Senha: " + pwd);
+            printMenuHeader("Vizualizar Senha");
 
-            System.out.println("\n\nPressione ENTER para continuar...");
-            sc.nextLine();
+            printInputMessage("ID da entrada"); 
+            String id = sc.nextLine();
 
-            return new VaultScreen(screenManager, vaultService, sc);
+            String pwd = vaultController.viewPassword(id);
+
+            System.out.println(">>> Senha: " + pwd);
+
+            ConsoleUtil.waitForEnter(sc);
+
+            return new VaultMenuScreen(screenManager, vaultService, sc);
         }
         catch (Exception e) {
-            System.out.println("Erro: " + e.getMessage());
-
-            System.out.println("\n\nPressione ENTER para continuar...");
-            sc.nextLine();
+            systemMessage(MessageType.ERROR, e.getMessage());
+            ConsoleUtil.waitForEnter(sc);
 
             return this;
         }

@@ -7,10 +7,10 @@ import controller.VaultController;
 import service.VaultService;
 import util.ConsoleUtil;
 
-public class VaultRemoveEntryScreen extends Screen {
+public class VaultGenerateRandomPassword extends Screen {
     private final VaultController vaultController;
 
-    public VaultRemoveEntryScreen(ScreenManager sm, VaultService vs, Scanner sc) {
+    public VaultGenerateRandomPassword(ScreenManager sm, VaultService vs, Scanner sc) {
         super(sm, vs, sc);
         this.vaultController = new VaultController(vs);
     }
@@ -18,18 +18,21 @@ public class VaultRemoveEntryScreen extends Screen {
     @Override
     public Screen show() {
         try {
-            printMenuHeader("Remover Entrada");
+            printMenuHeader("Gerador de senha aleatória");
 
-            printInputMessage("ID da entrada"); 
-            String id = sc.nextLine();
+            printInputMessage("Tamanho"); 
+            int len = tryParseOption(sc.nextLine());
 
-            vaultController.removeEntry(id);
+            if (len == -1)
+                return showInvalidOption();
 
-            systemMessage(MessageType.SUCCESS, "Entrada removida com sucesso");
+            String gen = vaultController.generatePassword(len);
+
+            System.out.println(">>> Senha gerada: " + gen);
 
             ConsoleUtil.waitForEnter(sc);
 
-            return new VaultMenuScreen(screenManager, vaultService, sc);
+            return new VaultGeneratePasswordScreen(screenManager, vaultService, sc);
         }
         catch (Exception e) {
             systemMessage(MessageType.ERROR, e.getMessage());

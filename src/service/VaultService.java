@@ -13,11 +13,11 @@ public class VaultService {
     private Map<String, VaultEntry> entries = new LinkedHashMap<>();
     private User currentUser = null;
     private SecretKey privateKey = null;
-    private static final Path STORE = Paths.get("vault_store.txt");
+    private static final Path VAULTDB = Paths.get("vaultdb.txt");
 
     // Register: only one user supported in this simple model
     public void register(String username, char[] masterPassword) throws Exception {
-        if (Files.exists(STORE)) 
+        if (Files.exists(VAULTDB)) 
             loadStore();
 
         if (currentUser != null) 
@@ -25,10 +25,11 @@ public class VaultService {
 
         byte[] salt = CryptoUtil.newSalt();
         String passwdStr = new String(masterPassword);
-        String verifier = CryptoUtil.SHA256(passwdStr, salt);
         SecretKey key = CryptoUtil.deriveKey(masterPassword, salt);
-//        String verifier = Base64.getEncoder().encodeToString(key.getEncoded());
+        String verifier = CryptoUtil.SHA256(passwdStr, salt);
+
         currentUser = new User(username, salt, verifier);
+
         privateKey = key;
 
         saveStore();
@@ -43,17 +44,10 @@ public class VaultService {
         String passwdStr = new String(masterPassword);
         String candidateHash = CryptoUtil.SHA256(passwdStr, currentUser.getSalt());
 
-        System.out.println("Login: " + currentUser.getVerifierHash());
-
         if (!candidateHash.equals(currentUser.getVerifierHash()))
             throw new AuthenticationException("Senha mestra incorreta.");
 
         SecretKey secretKey = CryptoUtil.deriveKey(masterPassword, currentUser.getSalt());
-//        String candidateHash = Base64.getEncoder().encodeToString(candidate.getEncoded());
-//
-//        if (!candidateHash.equals(currentUser.getVerifierHash())) 
-//            throw new AuthenticationException("Senha mestra incorreta.");
-//
         privateKey = secretKey;
     }
 
@@ -110,9 +104,15 @@ public class VaultService {
         return pg.generate(length);
     }
 
+    public String generatePassword(String text) {
+        PasswordGenerator pg = new PasswordGenerator();
+        
+        return pg.scramblePassword(text);
+    }
+
     // Persistence: simple custom format (no external deps)
     private void saveStore() throws PersistenceException {
-        try (BufferedWriter w = Files.newBufferedWriter(STORE)) {
+        try (BufferedWriter w = Files.newBufferedWriter(VAULTDB)) {
             if (currentUser != null) {
                 w.write("USER|" + escape(currentUser.getUsername()) + "|" 
                         + Base64.getEncoder().encodeToString(currentUser.getSalt()) 
@@ -140,10 +140,10 @@ public class VaultService {
     private void loadStore() throws PersistenceException {
         entries.clear();
 
-        if (!Files.exists(STORE)) 
+        if (!Files.exists(VAULTDB)) 
             return;
 
-        try (BufferedReader r = Files.newBufferedReader(STORE)) {
+        try (BufferedReader r = Files.newBufferedReader(VAULTDB)) {
             String line;
 
             while ((line = r.readLine()) != null) {
@@ -163,7 +163,7 @@ public class VaultService {
                     String uname = unescape(parts[3]);
                     String enc = unescape(parts[4]);
                     String url = unescape(parts[5]);
-                    String notes = parts.length>6?unescape(parts[6]):"";
+                    String notes = parts.length > 6 ? unescape(parts[6]) : "";
                     VaultEntry e = new VaultEntry(title, uname, enc, url, notes);
                     // override id to keep same
                     java.lang.reflect.Field f = VaultEntry.class.getDeclaredField("id"); f.setAccessible(true); f.set(e, id);

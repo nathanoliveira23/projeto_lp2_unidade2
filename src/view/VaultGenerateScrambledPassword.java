@@ -7,29 +7,28 @@ import controller.VaultController;
 import service.VaultService;
 import util.ConsoleUtil;
 
-public class VaultRemoveEntryScreen extends Screen {
+public class VaultGenerateScrambledPassword extends Screen {
     private final VaultController vaultController;
 
-    public VaultRemoveEntryScreen(ScreenManager sm, VaultService vs, Scanner sc) {
+    public VaultGenerateScrambledPassword(ScreenManager sm, VaultService vs, Scanner sc) {
         super(sm, vs, sc);
         this.vaultController = new VaultController(vs);
     }
-
+    
     @Override
     public Screen show() {
         try {
-            printMenuHeader("Remover Entrada");
+            printMenuHeader("Transformador de Senhas");
+            printInputMessage("Informe uma palavra");
+            String rawPassword = sc.nextLine();
 
-            printInputMessage("ID da entrada"); 
-            String id = sc.nextLine();
+            String scrambledPassword = vaultController.generatePassword(rawPassword);
 
-            vaultController.removeEntry(id);
-
-            systemMessage(MessageType.SUCCESS, "Entrada removida com sucesso");
+            System.out.println(">>> Senha fortificada: " + scrambledPassword);
 
             ConsoleUtil.waitForEnter(sc);
 
-            return new VaultMenuScreen(screenManager, vaultService, sc);
+            return new VaultGeneratePasswordScreen(screenManager, vaultService, sc);
         }
         catch (Exception e) {
             systemMessage(MessageType.ERROR, e.getMessage());

@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 public class ConsoleUtil {
     public static void waitForEnter(Scanner scanner) {
-        System.out.println("\n\nPressione ENTER para continuar...");
+        System.out.println(Color.BRIGHT_WHITE.apply("\n\nPressione ENTER para continuar..."));
         scanner.nextLine();
     }
     

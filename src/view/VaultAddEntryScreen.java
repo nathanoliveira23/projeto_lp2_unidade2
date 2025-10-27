@@ -3,41 +3,56 @@ package view;
 import java.util.Scanner;
 
 import app.ScreenManager;
+import controller.VaultController;
 import service.VaultService;
 import util.ConsoleUtil;
 
 public class VaultAddEntryScreen extends Screen {
+    private final VaultController vaultController;
+
     public VaultAddEntryScreen(ScreenManager sm, VaultService vs, Scanner sc) {
         super(sm, vs, sc);
+        this.vaultController = new VaultController(vs);
     }
 
     @Override
     public Screen show() {
         try {
-            System.out.print(">>> Título (ex: Gmail): "); 
+            printMenuHeader("Adicionar Entrada");
+
+            printInputMessage("Título (ex: Gmail)"); 
             String title = sc.nextLine();
-            System.out.print(">>> Usuário: "); 
+
+            printInputMessage("Usuário"); 
             String uname = sc.nextLine();
-            System.out.print(">>> Senha (ou deixe vazio para gerar): "); 
+
+            printInputMessage("Senha (ou deixe vazio para gerar)"); 
             String pass = sc.nextLine();
 
             if (pass.isBlank()) {
-                System.out.print(">>> Tamanho da senha: "); int len = Integer.parseInt(sc.nextLine());
-                pass = vaultService.generatePassword(len);
+                printInputMessage("Tamanho da senha"); 
+                int len = Integer.parseInt(sc.nextLine());
+
+                pass = vaultController.generatePassword(len);
+
                 System.out.println(">>> Senha gerada: " + pass);
             }
 
-            System.out.print(">>> URL: "); String url = sc.nextLine();
-            System.out.print(">>> Notas: "); String notes = sc.nextLine();
-            vaultService.addEntry(title, uname, pass, url, notes);
-            System.out.println(">>> Entrada adicionada.");
+            printInputMessage("URL"); 
+            String url = sc.nextLine();
 
+            printInputMessage("Notas"); 
+            String notes = sc.nextLine();
+
+            vaultController.createEntry(title, uname, pass, url, notes);
+
+            systemMessage(MessageType.SUCCESS, "Entrada adicionada com sucesso");
             ConsoleUtil.waitForEnter(sc);
 
-            return new VaultScreen(screenManager, vaultService, sc);
+            return new VaultMenuScreen(screenManager, vaultService, sc);
         }
         catch (Exception e) {
-            System.out.println("Erro: " + e.getMessage());
+            systemMessage(MessageType.ERROR, e.getMessage());
             ConsoleUtil.waitForEnter(sc);
 
             return this;

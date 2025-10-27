@@ -1,46 +1,54 @@
 package view;
 
-import java.io.Console;
 import java.util.Scanner;
 
 import app.ScreenManager;
+import controller.VaultController;
 import service.VaultService;
+import util.ConsoleUtil;
 
 public class VaultUpdateEntryScreen extends Screen {
-    private Console console = System.console();
+    private final VaultController vaultController;
 
     public VaultUpdateEntryScreen(ScreenManager sm, VaultService vs, Scanner sc) {
         super(sm, vs, sc);
+        this.vaultController = new VaultController(vs);
     }
 
     @Override
     public Screen show() {
         try {
-            System.out.print("ID da entrada: "); String idu = sc.nextLine();
-            System.out.print("Novo título (ou vazio): "); String nt = sc.nextLine();
-            System.out.print("Novo usuário (ou vazio): "); String nu = sc.nextLine();
-            System.out.print("Nova senha (ou vazio): "); String np = sc.nextLine();
-            System.out.print("Nova URL (ou vazio): "); String nuurl = sc.nextLine();
-            System.out.print("Novas notas (ou vazio): "); String nn = sc.nextLine();
+            printMenuHeader("Atualizar Entrada");
 
-            vaultService.updateEntry(idu, nt.isBlank() ? null : nt, 
-                    nu.isBlank()?null:nu, 
-                    np.isBlank()?null:np, 
-                    nuurl.isBlank()?null:nuurl, 
-                    nn.isBlank()?null:nn);
+            printInputMessage("ID da entrada"); 
+            String idu = sc.nextLine();
 
-            System.out.println("Atualizado.");
+            printInputMessage("Novo título (ou vazio)"); 
+            String nt = sc.nextLine();
 
-            System.out.println("\n\nPressione ENTER para continuar...");
-            sc.nextLine();
+            printInputMessage("Novo usuário (ou vazio)"); 
+            String nu = sc.nextLine();
 
-            return new VaultScreen(screenManager, vaultService, sc);
+            printInputMessage("Nova senha (ou vazio)"); 
+            String np = sc.nextLine();
+
+            printInputMessage("Nova URL (ou vazio)"); 
+            String nuurl = sc.nextLine();
+
+            printInputMessage("Novas notas (ou vazio)"); 
+            String nn = sc.nextLine();
+
+            vaultController.updateEntry(idu, nt, nu, np, nuurl, nn);
+
+            systemMessage(MessageType.SUCCESS, "Entrada atualizada com sucesso");
+
+            ConsoleUtil.waitForEnter(sc);
+
+            return new VaultMenuScreen(screenManager, vaultService, sc);
         }
         catch (Exception e) {
-            System.out.println("Erro: " + e.getMessage());
-
-            System.out.println("\n\nPressione ENTER para continuar...");
-            sc.nextLine();
+            systemMessage(MessageType.ERROR, e.getMessage());
+            ConsoleUtil.waitForEnter(sc);
 
             return this;
         }
