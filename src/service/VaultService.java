@@ -21,7 +21,7 @@ public class VaultService {
             loadStore();
 
         if (currentUser != null) 
-            throw new AuthenticationException("Usuário já registrado.");
+            throw new AuthenticationException("Já existe usuário cadastrado.");
 
         byte[] salt = CryptoUtil.newSalt();
         String passwdStr = new String(masterPassword);
