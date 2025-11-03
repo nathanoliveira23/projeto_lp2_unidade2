@@ -15,7 +15,6 @@ public class VaultService {
     private SecretKey privateKey = null;
     private static final Path VAULTDB = Paths.get("vaultdb.txt");
 
-    // Register: only one user supported in this simple model
     public void register(String username, char[] masterPassword) throws Exception {
         if (Files.exists(VAULTDB)) 
             loadStore();
@@ -110,7 +109,6 @@ public class VaultService {
         return pg.scramblePassword(text);
     }
 
-    // Persistence: simple custom format (no external deps)
     private void saveStore() throws PersistenceException {
         try (BufferedWriter w = Files.newBufferedWriter(VAULTDB)) {
             if (currentUser != null) {
