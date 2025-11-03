@@ -15,6 +15,9 @@ public class UserController {
         if (username == null || username.isBlank())
             throw new IllegalArgumentException("É necessario informar um nome de usuário.");
 
+        if (username.contains(" "))
+            throw new IllegalArgumentException("O nome de usuário não deve conter espaços em branco.");
+
         String passwordStr = new String(password);
 
         if (passwordStr == null || passwordStr.isBlank())
