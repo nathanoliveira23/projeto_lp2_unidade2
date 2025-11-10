@@ -8,9 +8,18 @@ import view.Logo;
 import view.Screen;
 
 public class ScreenManager {
-    private final VaultService vaultService = new VaultService();
+    private VaultService vaultService;
     private final Scanner sc = new Scanner(System.in);
     private boolean running = true;
+
+    public ScreenManager() {
+        try {
+            this.vaultService = new VaultService();
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
 
     public void start() {
         Screen current = new AuthenticationScreen(this, vaultService, sc);

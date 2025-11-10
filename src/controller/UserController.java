@@ -37,4 +37,26 @@ public class UserController {
         vaultService.login(username, masterPassword);
         Arrays.fill(masterPassword, '\0');
     }
+
+    public void updateUsername(String newUsername) throws Exception {
+        if (newUsername == null || newUsername.isBlank())
+            throw new IllegalArgumentException("Informe um nome de usuário válido.");
+
+        if (newUsername.contains(" "))
+            throw new IllegalArgumentException("O nome de usuário não deve conter espaços.");
+
+        vaultService.updateUsername(newUsername);
+    }
+
+    public void updatePassword(char[] newPassword) throws Exception {
+        if (newPassword == null || newPassword.length == 0)
+            throw new IllegalArgumentException("Senha não pode estar vazia.");
+
+        vaultService.updatePassword(newPassword);
+        Arrays.fill(newPassword, '\0');
+    }
+
+    public void deleteAccount() throws Exception {
+        vaultService.deleteAccount();
+    }
 }

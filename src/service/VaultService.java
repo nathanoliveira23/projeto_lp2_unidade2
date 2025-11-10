@@ -1,25 +1,35 @@
 package service;
 
 import model.*;
+import repository.UserRepository;
+import repository.VaultRepository;
 import util.*;
 import exception.*;
 import javax.crypto.SecretKey;
 import java.io.*;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
-import java.util.Base64;
 
 public class VaultService {
+    private final UserRepository userRepository;
+    private final VaultRepository vaultRepository;
+
     private Map<String, VaultEntry> entries = new LinkedHashMap<>();
     private User currentUser = null;
     private SecretKey privateKey = null;
-    private static final Path VAULTDB = Paths.get("vaultdb.txt");
+
+    public VaultService() throws IOException {
+        this.userRepository = new UserRepository();
+        this.vaultRepository = new VaultRepository();
+    }
 
     public void register(String username, char[] masterPassword) throws Exception {
-        if (Files.exists(VAULTDB)) 
-            loadStore();
+        User user = userRepository.findUserByName(username);
 
-        if (currentUser != null) 
+        if (user != null) 
             throw new AuthenticationException("Já existe usuário cadastrado.");
 
         byte[] salt = CryptoUtil.newSalt();
@@ -28,17 +38,18 @@ public class VaultService {
         String verifier = CryptoUtil.SHA256(passwdStr, salt);
 
         currentUser = new User(username, salt, verifier);
+        userRepository.addUser(currentUser);
 
         privateKey = key;
-
-        saveStore();
     }
 
     public void login(String username, char[] masterPassword) throws Exception {
-        loadStore();
+        User user = userRepository.findUserByName(username);
 
-        if (currentUser == null || !currentUser.getUsername().equals(username)) 
+        if (user == null || !user.getUsername().equals(username)) 
             throw new AuthenticationException("Usuário não existe.");
+
+        currentUser = user;
 
         String passwdStr = new String(masterPassword);
         String candidateHash = CryptoUtil.SHA256(passwdStr, currentUser.getSalt());
@@ -47,8 +58,87 @@ public class VaultService {
             throw new AuthenticationException("Senha mestra incorreta.");
 
         SecretKey secretKey = CryptoUtil.deriveKey(masterPassword, currentUser.getSalt());
+        Arrays.fill(masterPassword, '\0');
+
         privateKey = secretKey;
+
+        List<VaultEntry> entriesDB = vaultRepository.loadVault(currentUser.getUsername());
+
+        entries.clear();
+
+        for (VaultEntry entry : entriesDB)
+            this.entries.put(entry.getId(), entry);
     }
+
+    public void updateUsername(String newUsername) throws Exception {
+        if (currentUser == null)
+            throw new AuthenticationException("Nenhum usuário logado.");
+
+        User existing = userRepository.findUserByName(newUsername);
+        if (existing != null)
+            throw new IllegalArgumentException("Nome de usuário já está em uso.");
+
+        List<User> users = userRepository.findAll();
+        for (User u : users) {
+            if (u.getUsername().equals(currentUser.getUsername())) {
+                // Atualiza o nome de usuário
+                users.remove(u);
+                users.add(new User(newUsername, u.getSalt(), u.getVerifierHash()));
+                break;
+            }
+        }
+
+        userRepository.updateAll(users);
+
+        Path oldFile = Paths.get("data/vaults", currentUser.getUsername() + ".csv");
+        Path newFile = Paths.get("data/vaults", newUsername + ".csv");
+        if (Files.exists(oldFile)) {
+            Files.move(oldFile, newFile, StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        currentUser = new User(newUsername, currentUser.getSalt(), currentUser.getVerifierHash());
+    }
+    public void updatePassword(char[] newPassword) throws Exception {
+        if (currentUser == null)
+            throw new AuthenticationException("Nenhum usuário logado.");
+
+        byte[] salt = CryptoUtil.newSalt();
+        SecretKey newKey = CryptoUtil.deriveKey(newPassword, salt);
+        String verifier = CryptoUtil.SHA256(new String(newPassword), salt);
+        Arrays.fill(newPassword, '\0');
+
+        List<User> users = userRepository.findAll();
+
+        for (User u : users) {
+            if (u.getUsername().equals(currentUser.getUsername())) {
+                users.remove(u);
+                users.add(new User(currentUser.getUsername(), salt, verifier));
+                break;
+            }
+        }
+        userRepository.updateAll(users);
+
+        currentUser = new User(currentUser.getUsername(), salt, verifier);
+
+        privateKey = newKey;
+    }
+
+    public void deleteAccount() throws Exception {
+        if (currentUser == null)
+            throw new AuthenticationException("Nenhum usuário logado.");
+
+        String username = currentUser.getUsername();
+
+        userRepository.deleteUser(username);
+
+        Path file = Paths.get("data/vaults", username + ".csv");
+        Files.deleteIfExists(file);
+
+        currentUser = null;
+        privateKey = null;
+        entries.clear();
+    }
+
 
     public void addEntry(String title, String usernameEntry, String plainPassword, String url, String notes) throws Exception {
         if (privateKey == null) 
@@ -57,8 +147,8 @@ public class VaultService {
         String encrypted = CryptoUtil.encrypt(plainPassword, privateKey);
         VaultEntry e = new VaultEntry(title, usernameEntry, encrypted, url, notes);
         entries.put(e.getId(), e);
-
-        saveStore();
+        
+        vaultRepository.saveVault(currentUser.getUsername(), new ArrayList<>(entries.values()));
     }
 
     public List<VaultEntry> listEntries() { return new ArrayList<>(entries.values()); }
@@ -87,14 +177,14 @@ public class VaultService {
         if (url != null) e.setUrl(url);
         if (notes != null) e.setNotes(notes);
 
-        saveStore();
+        vaultRepository.saveVault(currentUser.getUsername(), new ArrayList<>(entries.values()));
     }
 
     public void removeEntry(String id) throws Exception {
         if (entries.remove(id) == null) 
             throw new EntryNotFoundException("Entrada não encontrada.");
 
-        saveStore();
+        vaultRepository.saveVault(currentUser.getUsername(), new ArrayList<>(entries.values()));
     }
 
     public String generatePassword(int length) {
@@ -107,84 +197,5 @@ public class VaultService {
         PasswordGenerator pg = new PasswordGenerator();
         
         return pg.scramblePassword(text);
-    }
-
-    private void saveStore() throws PersistenceException {
-        try (BufferedWriter w = Files.newBufferedWriter(VAULTDB)) {
-            if (currentUser != null) {
-                w.write("USER|" + escape(currentUser.getUsername()) + "|" 
-                        + Base64.getEncoder().encodeToString(currentUser.getSalt()) 
-                        + "|" + escape(currentUser.getVerifierHash()));
-
-                w.newLine();
-            } else {
-                w.write("USER|null"); 
-                w.newLine();
-            }
-
-            for (VaultEntry e : entries.values()) {
-                w.write("ENTRY|" + escape(e.getId()) 
-                                + "|" + escape(e.getTitle()) 
-                                + "|" + escape(e.getUsername()) + "|" 
-                                + escape(e.getEncryptedPassword()) + "|" 
-                                + escape(e.getUrl()) + "|" + escape(e.getNotes()));
-                w.newLine();
-            }
-        } catch (Exception ex) { 
-            throw new PersistenceException("Erro ao salvar store", ex); 
-        }
-    }
-
-    private void loadStore() throws PersistenceException {
-        entries.clear();
-
-        if (!Files.exists(VAULTDB)) 
-            return;
-
-        try (BufferedReader r = Files.newBufferedReader(VAULTDB)) {
-            String line;
-
-            while ((line = r.readLine()) != null) {
-                if (line.startsWith("USER|")) {
-                    String[] parts = line.split("\\|", 4);
-                    if (parts.length >= 4 && !parts[1].equals("null")) {
-                        String username = unescape(parts[1]);
-                        byte[] salt = Base64.getDecoder().decode(parts[2]);
-                        String verifier = unescape(parts[3]);
-                        currentUser = new User(username, salt, verifier);
-                    }
-                } else if (line.startsWith("ENTRY|")) {
-                    String[] parts = line.split("\\|", 8);
-                    // ENTRY|id|title|username|encryptedPassword|url|notes
-                    String id = unescape(parts[1]);
-                    String title = unescape(parts[2]);
-                    String uname = unescape(parts[3]);
-                    String enc = unescape(parts[4]);
-                    String url = unescape(parts[5]);
-                    String notes = parts.length > 6 ? unescape(parts[6]) : "";
-                    VaultEntry e = new VaultEntry(title, uname, enc, url, notes);
-                    // override id to keep same
-                    java.lang.reflect.Field f = VaultEntry.class.getDeclaredField("id"); f.setAccessible(true); f.set(e, id);
-                    entries.put(id, e);
-                }
-            }
-        } catch (Exception ex) { 
-            throw new PersistenceException("Erro ao carregar store", ex); 
-        }
-    }
-
-    // escape/unescape to avoid '|' issues (replace with percent encoding)
-    private String escape(String s) {
-        if (s == null)
-            return "";
-
-        return s.replace("%","%25").replace("|","%7C").replace("\n","%0A").replace("\r","%0D"); 
-    }
-
-    private String unescape(String s) {
-        if (s == null) 
-            return "";
-
-        return s.replace("%0D","\r").replace("%0A","\n").replace("%7C","|").replace("%25","%");
     }
 }

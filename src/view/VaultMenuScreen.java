@@ -37,6 +37,7 @@ public class VaultMenuScreen extends Screen {
                 case 4: return new VaultUpdateEntryScreen(screenManager, vaultService, sc);
                 case 5: return new VaultRemoveEntryScreen(screenManager, vaultService, sc);
                 case 6: return new VaultGeneratePasswordScreen(screenManager, vaultService, sc);
+                case 7: return new AccountSettingsScreen(screenManager, vaultService, sc);
                 case 0: 
                     screenManager.stop();
                     return null;

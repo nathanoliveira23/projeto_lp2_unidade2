@@ -25,7 +25,7 @@ public class Logo {
         System.out.println();
         System.out.println(Color.BRIGHT_YELLOW.apply("   Trabalho prático - Linguagem de Programação II    "));
         System.out.println(Color.BRIGHT_YELLOW.apply("           Gerador e Gerenciador de senhas           "));
-        System.out.println(Color.BRIGHT_YELLOW.apply("                Autor: Nathan Oliveira               "));
+        System.out.println(Color.BRIGHT_YELLOW.apply("      Autores: Nathan Oliveira e Fernanda Ho         "));
         System.out.println();
         System.out.println();
     }
