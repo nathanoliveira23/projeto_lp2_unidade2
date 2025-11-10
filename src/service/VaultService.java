@@ -1,17 +1,27 @@
 package service;
 
-import model.*;
+import model.User;
+import model.VaultEntry;
 import repository.UserRepository;
 import repository.VaultRepository;
-import util.*;
-import exception.*;
+import util.CryptoUtil;
+import util.PasswordGenerator;
+
 import javax.crypto.SecretKey;
-import java.io.*;
+
+import exception.AuthenticationException;
+import exception.EntryNotFoundException;
+
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class VaultService {
     private final UserRepository userRepository;
@@ -92,12 +102,14 @@ public class VaultService {
 
         Path oldFile = Paths.get("data/vaults", currentUser.getUsername() + ".csv");
         Path newFile = Paths.get("data/vaults", newUsername + ".csv");
+
         if (Files.exists(oldFile)) {
             Files.move(oldFile, newFile, StandardCopyOption.REPLACE_EXISTING);
         }
 
         currentUser = new User(newUsername, currentUser.getSalt(), currentUser.getVerifierHash());
     }
+
     public void updatePassword(char[] newPassword) throws Exception {
         if (currentUser == null)
             throw new AuthenticationException("Nenhum usuário logado.");
@@ -116,6 +128,7 @@ public class VaultService {
                 break;
             }
         }
+
         userRepository.updateAll(users);
 
         currentUser = new User(currentUser.getUsername(), salt, verifier);

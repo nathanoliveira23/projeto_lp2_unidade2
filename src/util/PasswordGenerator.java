@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.HashMap;
 import java.security.SecureRandom;
 
-import util.Color;
-
 public class PasswordGenerator {
     // Lista de caracteres possíveis para gerar senha
     private static final List<Character> CHARS = Arrays.asList(
