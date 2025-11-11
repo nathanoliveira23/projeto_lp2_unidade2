@@ -2,6 +2,9 @@
 
 Passgen é um sistema (CLI) gerador e gerenciador de senhas. Ele é um projeto da Unidade 2 da disciplina Linguagem de Programação II. Sua construção é inspirada nos sistemas web LastPass e Bitwarden que possuem o mesmo objetivo.
 
+## Repositorio
+https://github.com/nathanoliveira23/projeto_lp2_unidade2.git
+
 ## Autores
 - Ronald Nathan Silva de Oliveira
 - Fernanda Raquel Ramos Ho
