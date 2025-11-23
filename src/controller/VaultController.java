@@ -2,14 +2,14 @@ package controller;
 
 import java.util.List;
 
-import service.VaultService;
+import service.IVaultService;
 import model.VaultEntry;
 
 public class VaultController {
-    private final VaultService vaultService;
+    private final IVaultService vaultService;
     private final int MAXLENGHT = 32;
 
-    public VaultController(VaultService vs) {
+    public VaultController(IVaultService vs) {
         this.vaultService = vs;
     }
 

@@ -2,12 +2,12 @@ package controller;
 
 import java.util.Arrays;
 
-import service.VaultService;
+import service.IVaultService;
 
 public class UserController {
-    private final VaultService vaultService;
+    private final IVaultService vaultService;
     
-    public UserController(VaultService vs) {
+    public UserController(IVaultService vs) {
         this.vaultService = vs;
     }
 

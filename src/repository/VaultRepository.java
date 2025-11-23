@@ -9,7 +9,7 @@ import java.util.List;
 import model.VaultEntry;
 import util.CSVUtil;
 
-public class VaultRepository {
+public class VaultRepository implements IVaultRepository {
 
     public List<VaultEntry> loadVault(String username) throws IOException {
         Path file = Paths.get("data/vaults", username + ".csv");

@@ -23,7 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class VaultService {
+public class VaultService implements IVaultService {
     private final UserRepository userRepository;
     private final VaultRepository vaultRepository;
 

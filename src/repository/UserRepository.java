@@ -11,7 +11,7 @@ import java.util.List;
 import model.User;
 import util.CSVUtil;
 
-public class UserRepository {
+public class UserRepository implements IUserRepository {
     private static final Path USERS = Paths.get("data/users.csv");
 
     public UserRepository() throws IOException {
