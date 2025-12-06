@@ -4,8 +4,6 @@ import model.User;
 import model.VaultEntry;
 import repository.IUserRepository;
 import repository.IVaultRepository;
-import repository.UserRepository;
-import repository.VaultRepository;
 import util.CryptoUtil;
 import util.PasswordGenerator;
 
@@ -14,7 +12,6 @@ import javax.crypto.SecretKey;
 import exception.AuthenticationException;
 import exception.EntryNotFoundException;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,7 +30,7 @@ public class VaultService implements IVaultService {
     private User currentUser = null;
     private SecretKey privateKey = null;
 
-    public VaultService(IUserRepository userRepository, IVaultRepository vaultRepository) throws IOException {
+    public VaultService(IUserRepository userRepository, IVaultRepository vaultRepository) {
         this.userRepository = userRepository;
         this.vaultRepository = vaultRepository;
     }
