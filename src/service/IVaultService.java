@@ -16,6 +16,7 @@ public interface IVaultService {
     List<VaultEntry> listEntries();
     void updateEntry(String id, String title, String usernameEntry, String plainPassword, String url, String notes) throws Exception;
     void removeEntry(String id) throws Exception;
+    String viewDecryptedPassword(String id) throws Exception;
 
     String generatePassword(int length);
     String generatePassword(String text);
