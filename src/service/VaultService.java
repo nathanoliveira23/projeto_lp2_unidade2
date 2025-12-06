@@ -2,6 +2,8 @@ package service;
 
 import model.User;
 import model.VaultEntry;
+import repository.IUserRepository;
+import repository.IVaultRepository;
 import repository.UserRepository;
 import repository.VaultRepository;
 import util.CryptoUtil;
@@ -24,16 +26,16 @@ import java.util.List;
 import java.util.Map;
 
 public class VaultService implements IVaultService {
-    private final UserRepository userRepository;
-    private final VaultRepository vaultRepository;
+    private final IUserRepository userRepository;
+    private final IVaultRepository vaultRepository;
 
     private Map<String, VaultEntry> entries = new LinkedHashMap<>();
     private User currentUser = null;
     private SecretKey privateKey = null;
 
-    public VaultService() throws IOException {
-        this.userRepository = new UserRepository();
-        this.vaultRepository = new VaultRepository();
+    public VaultService(IUserRepository userRepository, IVaultRepository vaultRepository) throws IOException {
+        this.userRepository = userRepository;
+        this.vaultRepository = vaultRepository;
     }
 
     public void register(String username, char[] masterPassword) throws Exception {

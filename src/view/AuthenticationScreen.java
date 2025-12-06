@@ -3,12 +3,12 @@ package view;
 import java.util.Scanner;
 
 import app.ScreenManager;
-import service.VaultService;
+import service.IVaultService;
 import util.ConsoleUtil;
 
 public class AuthenticationScreen extends Screen {
 
-    public AuthenticationScreen(ScreenManager sm, VaultService vs, Scanner sc) {
+    public AuthenticationScreen(ScreenManager sm, IVaultService vs, Scanner sc) {
         super(sm, vs, sc);
     }
 

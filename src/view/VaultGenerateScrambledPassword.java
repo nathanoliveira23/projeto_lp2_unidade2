@@ -4,13 +4,14 @@ import java.util.Scanner;
 
 import app.ScreenManager;
 import controller.VaultController;
+import service.IVaultService;
 import service.VaultService;
 import util.ConsoleUtil;
 
 public class VaultGenerateScrambledPassword extends Screen {
     private final VaultController vaultController;
 
-    public VaultGenerateScrambledPassword(ScreenManager sm, VaultService vs, Scanner sc) {
+    public VaultGenerateScrambledPassword(ScreenManager sm, IVaultService vs, Scanner sc) {
         super(sm, vs, sc);
         this.vaultController = new VaultController(vs);
     }

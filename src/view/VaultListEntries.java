@@ -6,13 +6,14 @@ import java.util.List;
 import app.ScreenManager;
 import controller.VaultController;
 import model.VaultEntry;
+import service.IVaultService;
 import service.VaultService;
 import util.ConsoleUtil;
 
 public class VaultListEntries extends Screen {
     private final VaultController vaultController;
 
-    public VaultListEntries(ScreenManager sm, VaultService vs, Scanner sc) {
+    public VaultListEntries(ScreenManager sm, IVaultService vs, Scanner sc) {
         super(sm, vs, sc);
         this.vaultController = new VaultController(vs);
     }

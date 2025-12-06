@@ -3,11 +3,11 @@ package view;
 import java.util.Scanner;
 
 import app.ScreenManager;
-import service.VaultService;
+import service.IVaultService;
 
 public class AccountSettingsScreen extends Screen {
 
-    public AccountSettingsScreen(ScreenManager sm, VaultService vs, Scanner sc) {
+    public AccountSettingsScreen(ScreenManager sm, IVaultService vs, Scanner sc) {
         super(sm, vs, sc);
     }
 

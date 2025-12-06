@@ -1,6 +1,6 @@
 package view;
 
-import service.VaultService;
+import service.IVaultService;
 
 import java.util.Scanner;
 
@@ -10,12 +10,12 @@ import util.ConsoleUtil;
 
 public abstract class Screen {
     protected final ScreenManager screenManager;
-    protected final VaultService vaultService;
+    protected final IVaultService vaultService;
     protected final Scanner sc;
 
     protected enum MessageType { SUCCESS, ERROR, WARNING }
 
-    public Screen(ScreenManager screenManager, VaultService vaultService, Scanner sc) {
+    public Screen(ScreenManager screenManager, IVaultService vaultService, Scanner sc) {
         this.screenManager = screenManager;
         this.vaultService = vaultService;
         this.sc = sc;

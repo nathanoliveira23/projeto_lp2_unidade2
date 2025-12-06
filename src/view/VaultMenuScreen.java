@@ -3,10 +3,11 @@ package view;
 import java.util.Scanner;
 
 import app.ScreenManager;
+import service.IVaultService;
 import service.VaultService;
 
 public class VaultMenuScreen extends Screen {
-    public VaultMenuScreen(ScreenManager sm, VaultService vs, Scanner sc) {
+    public VaultMenuScreen(ScreenManager sm, IVaultService vs, Scanner sc) {
         super(sm, vs, sc);
     }
 

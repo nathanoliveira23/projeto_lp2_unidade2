@@ -5,14 +5,14 @@ import java.io.Console;
 
 import app.ScreenManager;
 import controller.UserController;
-import service.VaultService;
+import service.IVaultService;
 import util.ConsoleUtil;
 
 public class LoginScreen extends Screen {
     private final Console console = System.console();
     private final UserController userController;
 
-    public LoginScreen(ScreenManager sm, VaultService vs, Scanner sc) {
+    public LoginScreen(ScreenManager sm, IVaultService vs, Scanner sc) {
         super(sm, vs, sc);
         this.userController = new UserController(vs);
     }

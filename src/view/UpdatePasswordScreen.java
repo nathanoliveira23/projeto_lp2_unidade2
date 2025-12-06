@@ -4,12 +4,12 @@ import java.util.Scanner;
 
 import app.ScreenManager;
 import controller.UserController;
-import service.VaultService;
+import service.IVaultService;
 
 public class UpdatePasswordScreen extends Screen {
     private final UserController userController;
 
-    public UpdatePasswordScreen(ScreenManager sm, VaultService vs, Scanner sc) {
+    public UpdatePasswordScreen(ScreenManager sm, IVaultService vs, Scanner sc) {
         super(sm,vs, sc);
         this.userController = new UserController(vs);
     }

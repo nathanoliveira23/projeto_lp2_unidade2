@@ -4,12 +4,12 @@ import java.util.Scanner;
 
 import app.ScreenManager;
 import controller.UserController;
-import service.VaultService;
+import service.IVaultService;
 
 public class UpdateUsernameScreen extends Screen {
     private final UserController userController;
 
-    public UpdateUsernameScreen(ScreenManager sm, VaultService vs, Scanner sc) {
+    public UpdateUsernameScreen(ScreenManager sm, IVaultService vs, Scanner sc) {
         super(sm,vs, sc);
         this.userController = new UserController(vs);
     }

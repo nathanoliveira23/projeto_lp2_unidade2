@@ -4,13 +4,13 @@ import java.util.Scanner;
 
 import app.ScreenManager;
 import controller.UserController;
-import service.VaultService;
+import service.IVaultService;
 import util.ConsoleUtil;
 
 public class DeleteAccountScreen extends Screen {
     private final UserController userController;
 
-    public DeleteAccountScreen(ScreenManager sm, VaultService vs, Scanner sc) {
+    public DeleteAccountScreen(ScreenManager sm, IVaultService vs, Scanner sc) {
         super(sm,vs, sc);
         this.userController = new UserController(vs);
     }

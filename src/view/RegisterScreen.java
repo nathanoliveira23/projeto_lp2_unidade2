@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 import app.ScreenManager;
 import controller.UserController;
-import service.VaultService;
+import service.IVaultService;
 import util.Color;
 import util.ConsoleUtil;
 
@@ -13,7 +13,7 @@ public class RegisterScreen extends Screen {
     Console console = System.console();
     private final UserController userController;
 
-    public RegisterScreen(ScreenManager sm, VaultService vs, Scanner sc) {
+    public RegisterScreen(ScreenManager sm, IVaultService vs, Scanner sc) {
         super(sm, vs, sc);
         this.userController = new UserController(vs);
     }

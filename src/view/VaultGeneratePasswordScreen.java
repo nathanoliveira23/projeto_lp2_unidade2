@@ -3,11 +3,12 @@ package view;
 import java.util.Scanner;
 
 import app.ScreenManager;
+import service.IVaultService;
 import service.VaultService;
 import util.ConsoleUtil;
 
 public class VaultGeneratePasswordScreen extends Screen {
-    public VaultGeneratePasswordScreen(ScreenManager sm, VaultService vs, Scanner sc) {
+    public VaultGeneratePasswordScreen(ScreenManager sm, IVaultService vs, Scanner sc) {
         super(sm, vs, sc);
     }
 

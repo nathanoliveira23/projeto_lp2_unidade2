@@ -4,13 +4,14 @@ import java.util.Scanner;
 
 import app.ScreenManager;
 import controller.VaultController;
+import service.IVaultService;
 import service.VaultService;
 import util.ConsoleUtil;
 
 public class VaultUpdateEntryScreen extends Screen {
     private final VaultController vaultController;
 
-    public VaultUpdateEntryScreen(ScreenManager sm, VaultService vs, Scanner sc) {
+    public VaultUpdateEntryScreen(ScreenManager sm, IVaultService vs, Scanner sc) {
         super(sm, vs, sc);
         this.vaultController = new VaultController(vs);
     }

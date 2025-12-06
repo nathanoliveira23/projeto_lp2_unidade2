@@ -4,13 +4,13 @@ import java.util.Scanner;
 
 import app.ScreenManager;
 import controller.VaultController;
-import service.VaultService;
+import service.IVaultService;
 import util.ConsoleUtil;
 
 public class VaultViewDecryptedPassword extends Screen {
     private final VaultController vaultController;
 
-    public VaultViewDecryptedPassword(ScreenManager sm, VaultService vs, Scanner sc) {
+    public VaultViewDecryptedPassword(ScreenManager sm, IVaultService vs, Scanner sc) {
         super(sm, vs, sc);
         this.vaultController = new VaultController(vs);
     }
