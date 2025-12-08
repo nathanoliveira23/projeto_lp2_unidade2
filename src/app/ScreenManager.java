@@ -4,6 +4,8 @@ import java.util.Scanner;
 
 import repository.IUserRepository;
 import repository.IVaultRepository;
+import repository.UserRepository;
+import repository.VaultRepository;
 import service.VaultService;
 import util.ConsoleUtil;
 import view.AuthenticationScreen;
@@ -19,6 +21,9 @@ public class ScreenManager {
 
     public ScreenManager() {
         try {
+            this.userRepository  = new UserRepository();
+            this.vaultRepository = new VaultRepository();
+
             this.vaultService = new VaultService(userRepository, vaultRepository);
         }
         catch (Exception e) {
